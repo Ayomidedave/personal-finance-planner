@@ -1,9 +1,14 @@
+import os
+
+import uvicorn
 from fastapi import FastAPI
 
 from app.database import Base, engine
 from app.planning import models as planning_models
+from app.planning.router import router as planning_router
 from app.transactions import models as transaction_models
 from app.transactions.router import router as transactions_router
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,8 +19,18 @@ app = FastAPI(
 )
 
 app.include_router(transactions_router)
+app.include_router(planning_router)
 
 
 @app.get("/")
 def root():
     return {"message": "Personal Finance Planner API is running"}
+
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+    )

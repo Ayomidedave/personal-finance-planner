@@ -1,7 +1,15 @@
+import os
+from pathlib import Path
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = "sqlite:///./finance.db"
+
+DATA_DIR = Path(os.getenv("DATA_DIR", "."))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+DATABASE_PATH = DATA_DIR / "finance.db"
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 
 class Base(DeclarativeBase):
@@ -19,9 +27,9 @@ SessionLocal = sessionmaker(
     autocommit=False,
 )
 
+
 def get_db():
     db = SessionLocal()
-
     try:
         yield db
     finally:
